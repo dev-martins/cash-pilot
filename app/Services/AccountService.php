@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Jobs\ProcessBigTransfer;
 use App\Repositories\AccountRepository;
+use Illuminate\Support\Facades\Auth;
 
 class AccountService
 {
@@ -15,6 +17,13 @@ class AccountService
 
     public function transfer(string $recipientEmail, float $amount)
     {
-        return $this->accountRepository->tranfer($recipientEmail, $amount);
+        $sender = Auth::user();
+
+        if ($amount >= env('BIG_TRANSFER_THRESHOLD')) {
+            ProcessBigTransfer::dispatch($recipientEmail, $amount, $sender);
+            return;
+        }
+
+        $this->accountRepository->tranfer($recipientEmail, $amount, $sender);
     }
 }

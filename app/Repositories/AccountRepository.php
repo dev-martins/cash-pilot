@@ -19,9 +19,8 @@ class AccountRepository
         ];
     }
 
-    public function tranfer(string $recipientEmail, float $amount)
+    public function tranfer(string $recipientEmail, float $amount, object $sender)
     {
-        $sender = Auth::user();
         $receiver = User::where('email', $recipientEmail)->firstOrFail();
 
         if ($receiver->id === $sender->id) {
